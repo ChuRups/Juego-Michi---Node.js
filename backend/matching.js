@@ -28,6 +28,7 @@ module.exports = () => {
 			playerId: 0,
 			opponentId: 1,
 		}));
+		
 		players[p2ID].socket.emit("gameState", game.newGame({
 			players: [players[p1ID], players[p2ID]],
 			roomID,
