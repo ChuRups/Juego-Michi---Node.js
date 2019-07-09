@@ -1,29 +1,41 @@
+const game = require("./gameState")
+
+
 module.exports = () => {
-	let players = {},
-		onWait = [],
-		onMatch = {};
+	let players = {}, onWait = [], onMatch = {};
 
 	const loop = setInterval(checkQueue, 5000);
-
-	function printListStatus() {
-		console.info(`Queues:{ Players: ${Object.keys(players).length}, Onwait: ${onWait.length}; OnMatch: ${Object.keys(onMatch).length}; }`)
-	}
-
 	function checkQueue() {
-		printListStatus();
+		console.info(`Queues: {Players: ${Object.keys(players).length},OnWait: ${onWait.length}, OnMatch {Players: ${Object.keys(onMatch).length}}`);
 		while (onWait.length >= 2) {
 			console.log("Constructing room...");
-			/**
-			 * 
-			 * Reemplazar este bloque
-			 * 
-			 */
-			const p1 = players[onWait.pop()].user.name;
-			const p2 = players[onWait.pop()].user.name;
-			console.log(`We created a match for ${p1} and ${p2}`)
+			createMatch(onWait.pop(), onWait.pop());
 		}
 	}
-	
+
+	function createMatch(p1ID, p2ID) {
+		const roomID = p1ID + p2ID;
+		players[p1ID].roomID = roomID;
+		players[p2ID].roomID = roomID;
+		if (!onMatch[roomID]) onMatch[roomID] = game.newGame({
+			players: [players[p1ID], players[p2ID]],
+			roomID
+		});
+
+		players[p1ID].socket.emit("gameState", game.newGame({
+			players: [players[p1ID], players[p2ID]],
+			roomID,
+			playerId: 0,
+			opponentId: 1,
+		}));
+		players[p2ID].socket.emit("gameState", game.newGame({
+			players: [players[p1ID], players[p2ID]],
+			roomID,
+			playerId: 1,
+			opponentId: 0,
+		}));
+	}
+
 	return {
 		// user: {socket, user}
 		userConnect: ({ socket, user }) => {

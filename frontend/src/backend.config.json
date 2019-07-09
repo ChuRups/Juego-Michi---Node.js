@@ -1,5 +1,5 @@
 {
-	"SERVER_ADDRESS": "localhost",
+	"SERVER_ADDRESS": "192.168.252.210",
 	"SERVER_PORT": "3001",
 	"SERVER_PROTOCOL": "http://"
 }
